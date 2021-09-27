@@ -1,0 +1,223 @@
+---
+title: "R tutorial using epitools"
+author: "Mark Bounthavong"
+date: "9/26/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Installing and using `epitools`
+This tutorial will center around using the R package `epitools`.
+
+Install the package `epitools`
+```{r}
+# install.packages("epitools")    ### Once installed, you can comment this line
+library("epitools")             ### Load the epitools package
+```
+
+
+## Overview
+`epitools` is an R package that allows you to perform basic epidemiologic calculations such as the risk ratio and odds ratio. Documentation on `epitools` can be found using the following [link](https://cran.r-project.org/web/packages/epitools/epitools.pdf)
+
+In this example, we will go over how to use `epitools` to estimate the risk ratio and odds ratio using a matrix that we create. This is useful for when you have a table (e.g., 2 x 2 contingency table) and want to check the risk ratio or odds ratio. 
+
+Here some examples of using `epitools`.
+
+### Step 1: We create a matrix using some values
+```{r}
+##########################################
+### Estimate the risk and odds ratios
+##########################################
+# Step 1: create a matrix
+Table1 <- matrix(c(11, 36, 518, 517), nrow = 2, ncol = 2)
+Table1
+```
+This generates the 2 x 2 contingency table that we will use for this simple example. The arrangement is critical for interpreting the output. The exposure variable or predictor of interest is in the rows and the outcome variable is in the column. 
+
+Here is an example of the arrangement:
+```{r , echo=FALSE, fig.cap="2 x 2 contingency table arrangement", out.width = '50%'}
+knitr::include_graphics("C:\\Users\\mboun\\Dropbox\\Marks blog\\R - Epitools\\Figures and tables\\Figure 1.jpg")
+```
+
+### Step 2: We use the `riskratio.wald()` function to estimate the risk ratio for our object (`Table1`)
+```{r}
+# Step 2: Estimate the RR
+riskratio.wald(Table1)
+```
+The risk ratio is 0.95 with a 95% confidence interval of 0.93, 0.98. The p-value is <0.001. Therefore, subjects in the Exposure Group 1 had a 5% lower risk of developing the outcome (Outcome = 1) compared to subjects in the Exposure Group 2. 
+
+### Step 3: We use the `oddsratio.wald()` function to estimate the odds ratio for our object (`Table1`)
+```{r}
+# Step 3: Estimate the OR
+oddsratio.wald(Table1)
+```
+
+Once you've estimated the risk ratio and odds ratio, you can double check your work. Here is how I checked the odds ratio calculation.
+```{r}
+### You can double check your work
+num <- 11 * 517
+denom <- 518 * 36
+OR <- num / denom
+OR
+```
+
+Unfortunately, `epitools` does not seem to estimate the risk differences, so I show how you can do that using some simple R codes. 
+```{r}
+# Step 4: Estimate the risk difference
+risk1 <- 11 / 518
+risk2 <- 36 / 517
+RD <- risk1 - risk2
+RD
+```
+
+
+### Motivating example
+Suppose we were interested in figuring out if confounding or effect modification was happening to a hypothetical drug study. In this drug study, patients received either Drug A or Drug B. These patients were followed up for 12 months and assessed for all-cause mortality (e.g., death). 
+
+Here is a direct acyclic graph depicting Drug and Death with Exercise as a potential confounder.
+```{r , echo=FALSE, fig.cap=" ", out.width = '50%'}
+knitr::include_graphics("C:\\Users\\mboun\\Dropbox\\Marks blog\\R - Epitools\\Figures and tables\\Figure 2.jpg")
+```
+
+Let's assume a retrospective cohort study was performed to collect data to investigate the association between using Drug A or B and all-cause mortality. The data are aggregated into a contingency table. 
+```{r , echo=FALSE, fig.cap=" ", out.width = '50%'}
+knitr::include_graphics("C:\\Users\\mboun\\Dropbox\\Marks blog\\R - Epitools\\Figures and tables\\Figure 3.jpg")
+```
+
+We can enter the values from the table into R as a matrix
+```{r}
+##############################################################
+# Motivating Example #1 (Does Drug A or B cause Death?)
+##############################################################
+Table2 <- matrix(c(250, 150, 2000, 1500), nrow = 2, ncol = 2)
+Table2
+```
+
+Then we can estimate the risk ratio and odds ratio
+```{r}
+riskratio.wald(Table2)
+oddsratio.wald(Table2)
+```
+Subjects who received Drug A had a 2% increase in Death compared to subjects who received Drug B (RR = 1.02; 95% CI: 1.00, 1.04; P=0.040). 
+Subjects who received Drug A had a 25% increase in Death compared to subjects who received Drug B (OR = 1.25; 95% CI: 1.01, 1.55; P=0.40). 
+In both these measures, the association was significant.
+
+### Confounding
+Let's supppose we are interested in seeing whether Exercise is a confounder on the Drug to Death direct pathway. 
+
+To check if there is confounding, we need to determine if the confounder meets two criteria:
+1) The distribution of the confounding variable differs between exposed and unexposed groups
+2) Among the unexposed, there should be an association between the confounder and the health outcome
+
+For the first criterion, we look at the association and distribution between Exercise and Drug assignment. 
+
+```{r}
+
+##########################################
+# Confounding
+##########################################
+
+### Distribution of Exercise across Drug groups
+# Among Drug A (N=2250)
+Table3 <- matrix(c(150, 100, 1600, 400), nrow = 2, ncol = 2)
+Table3
+
+riskratio.wald(Table3)
+oddsratio.wald(Table3)
+
+
+# Among Drug B (N=1650)
+Table4 <- matrix(c(50, 100, 800, 700), nrow = 2, ncol = 2)
+Table4
+
+riskratio.wald(Table4)
+oddsratio.wald(Table4)
+```
+The results are summarized into the following table. Among subjects in Drug A, those who exercise had a lower risk (RR = 0.88; 95% CI: 0.84, 0.92) and odds (OR = 0.38; 95% CI: 0.28, 0.49) of Death compared to those who did not exercise. Similarly, among subjects in Drug B, those who exercise had a lower risk (RR = 0.93; 95% CI: 0.90, 0.96) and odds (OR = 0.44; 95% CI: 0.31, 0.62) of Death compared to those who did not exercise. 
+```{r , echo=FALSE, fig.cap=" ", out.width = '70%'}
+knitr::include_graphics("C:\\Users\\mboun\\Dropbox\\Marks blog\\R - Epitools\\Figures and tables\\Figure 4.jpg")
+```
+
+We can also look at the distribution of subjects who exercised across the drug groups. 
+```{r}
+DrugA.dist <- 1750 / (1750 + 500)
+DrugA.dist
+DrugB.dist <- 850 / (850 + 800)
+DrugB.dist
+```
+Among subjects in Drug A, 78% of them exercised compared to 52% in Drug B. This is considered a meaningful difference in distribution and satisfies the first criterion of confounding. 
+
+Let's check to see if Exercise meets the second criterion for confounding (e.g., Among the unexposed, there should be an association between the confounder and the health outcome).
+
+We look at the association between Exercise and Death. 
+```{r}
+### Exercise associated with Death?
+# Among those who DONT exercise
+Table5<- matrix(c(200, 200, 2400, 1100), nrow = 2, ncol= 2)
+Table5
+
+riskratio.wald(Table5)
+oddsratio.wald(Table5)
+```
+Subjects who exercise had a lower risk (RR = 0.92; 95% CI: 0.89, 0.94) and odds (OR = 0.46; 95% CI: 0.37, 0.56 ) of Death compared to subjects who did not exercise. Hence, this satisfies the second criterion for confounding. The results are summarized into a table below. 
+
+```{r , echo=FALSE, fig.cap=" ", out.width = '70%'}
+knitr::include_graphics("C:\\Users\\mboun\\Dropbox\\Marks blog\\R - Epitools\\Figures and tables\\Figure 5.jpg")
+```
+
+Now, we can summarize our findings into a single figure below. Based on our use of `epitools` we have found that there was a significant association between Exercise and Drug and between Exercise and Death. Additionally, the distribution of subjects who exercise differed meaningfully between Drug A and Drug B. 
+```{r , echo=FALSE, fig.cap=" ", out.width = '70%'}
+knitr::include_graphics("C:\\Users\\mboun\\Dropbox\\Marks blog\\R - Epitools\\Figures and tables\\Figure 6.jpg")
+```
+
+
+### Interaction or Effect Modification
+Once we've examined whether Exercise was a confounder, we should examine whether it is an effect modifier. Effect modifiers occur when the third variable (e.g., Exercise) modifies the exposure to outcome relationship. In other words, when you vary the exercise level, the effect of the exposure to outcome pathway will change. See diagram below.
+
+```{r , echo=FALSE, fig.cap=" ", out.width = '70%'}
+knitr::include_graphics("C:\\Users\\mboun\\Dropbox\\Marks blog\\R - Epitools\\Figures and tables\\Figure 7.jpg")
+```
+
+To assess effect modification, we stratify the groups into the different levels of the third variable. Let's assume that the Exercise variable has two levels (Yes / No). We strategy the analysis based on these two levels of Exercise. 
+
+```{r}
+
+##########################################
+# Interactions or Effect Modification
+##########################################
+# Among those who exercise (Drug associated with Death)
+Table6 <- matrix(c(150, 50, 1600, 800), nrow = 2, ncol= 2)
+Table6
+
+riskratio.wald(Table6)
+oddsratio.wald(Table5)
+
+# Among those who DONT exercise (Drug associated with Death)
+Table7<- matrix(c(100, 100, 400, 700), nrow = 2, ncol= 2)
+Table7
+
+riskratio.wald(Table7)
+oddsratio.wald(Table7)
+```
+
+After stratifying based on the Exercise variable level, we can see that the point estimates for the risk ratio and odds ratio are different. It's not easy to see the difference with the risk ratio (1.03 versus 1.09), but you can see the difference with the odds ratio (1.50 versus 1.75). The findings are summarized into a table below. 
+
+```{r , echo=FALSE, fig.cap=" ", out.width = '70%'}
+knitr::include_graphics("C:\\Users\\mboun\\Dropbox\\Marks blog\\R - Epitools\\Figures and tables\\Figure 8.jpg")
+```
+
+There are statistical tests that you can use to determine if these are different, but you can also eye ball this with the crude risk ratio and odds ratio. For now, we'll compare these risk ratio and odds ratio to the crude values. See diagram below.
+
+```{r , echo=FALSE, fig.cap=" ", out.width = '70%'}
+knitr::include_graphics("C:\\Users\\mboun\\Dropbox\\Marks blog\\R - Epitools\\Figures and tables\\Figure 9.jpg")
+```
+
+Notice that the crude risk ratio (RR = 1.02) is outside the range of the stratified risk ratios (range: 1.03 and 1.09). This is a good indicator that Exercise is an effect modifier. Similarly, you can do this quick test with the odds ratio; notice how the crude odds ratio is not within the stratified odds ratio range (1.50 to 1.75). 
+
+## Conclusions
+Using `epitools` will help you quickly estimate the risk and odds ratio for any 2 x 2 contingency table. Moreover, you can also check for confouding and interaction using this tool. However, it is always prudent to make sure you are also using the raw data to control for confounders and assess interaction in a regression model. 
+
+
