@@ -67,8 +67,8 @@ OR
 Unfortunately, `epitools` does not seem to estimate the risk differences, so I show how you can do that using some simple R codes. 
 ```{r}
 # Step 4: Estimate the risk difference
-risk1 <- 11 / 518
-risk2 <- 36 / 517
+risk1 <- 11 / (518 + 11)
+risk2 <- 36 / (517 + 36)
 RD <- risk1 - risk2
 RD
 ```
