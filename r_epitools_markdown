@@ -18,6 +18,8 @@ Install the package `epitools`
 library("epitools")             ### Load the epitools package
 ```
 
+## GitHub page
+The entire R Markdown code is located on my GitHub page [link](https://github.com/mbounthavong/R_epitools/blob/main/r_epitools_markdown)
 
 ## Overview
 `epitools` is an R package that allows you to perform basic epidemiologic calculations such as the risk ratio and odds ratio. Documentation on `epitools` can be found using the following [link](https://cran.r-project.org/web/packages/epitools/epitools.pdf)
