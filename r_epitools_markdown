@@ -1,7 +1,7 @@
 ---
 title: "R tutorial using epitools"
 author: "Mark Bounthavong"
-date: "9/26/2021"
+date: "9/26/2021 Updated on 10/02/2021"
 output: html_document
 ---
 
@@ -35,29 +35,35 @@ Here some examples of using `epitools`.
 Table1 <- matrix(c(11, 36, 518, 517), nrow = 2, ncol = 2)
 Table1
 ```
-This generates the 2 x 2 contingency table that we will use for this simple example. The arrangement is critical for interpreting the output. The exposure variable or predictor of interest is in the rows and the outcome variable is in the column. 
+This generates the 2 x 2 contingency table that we will use for this simple example. The arrangement is critical for interpreting the output. By default, the unexposed group (exposure = 0) is in the first row and the non-outcome (outcome = 0) is in the first column. However, you can use the `epitools` command to change this arrangement with the `rev()` argument so that the analysis will use the contingency table on the right where the exposed group (exposure = 1) is in the first row and the outcome (outcome = 1) is in the first column. 
 
 Here is an example of the arrangement:
-```{r , echo=FALSE, fig.cap="2 x 2 contingency table arrangement", out.width = '50%'}
-knitr::include_graphics("C:\\Users\\mboun\\Dropbox\\Marks blog\\R - Epitools\\Figures and tables\\Figure 1.jpg")
+```{r , echo=FALSE, fig.cap="2 x 2 contingency table arrangement", out.width = '80%'}
+knitr::include_graphics("C:\\Users\\mboun\\Dropbox\\Marks blog\\R - Epitools\\Figures and tables\\Figure1a.jpg")
 ```
 
 ### Step 2: We use the `riskratio.wald()` function to estimate the risk ratio for our object (`Table1`)
 ```{r}
 # Step 2: Estimate the RR
-riskratio.wald(Table1)
+riskratio.wald(Table1, rev = c("both")) # use the rev() argument to change the arrangement of the contingency table
 ```
 The risk ratio is 0.95 with a 95% confidence interval of 0.93, 0.98. The p-value is <0.001. Therefore, subjects in the Exposure Group 1 had a 5% lower risk of developing the outcome (Outcome = 1) compared to subjects in the Exposure Group 2. 
 
 ### Step 3: We use the `oddsratio.wald()` function to estimate the odds ratio for our object (`Table1`)
 ```{r}
 # Step 3: Estimate the OR
-oddsratio.wald(Table1)
+oddsratio.wald(Table1, rev = c("both"))
 ```
 
-Once you've estimated the risk ratio and odds ratio, you can double check your work. Here is how I checked the odds ratio calculation.
+Once you've estimated the risk ratio and odds ratio, you can double check your work. Here is how I checked the risk and odds ratio calculation.
 ```{r}
-### You can double check your work
+### RR check
+risk1 <- 11 / (11+517)
+risk2 <- 36/(36+518)
+RR <- risk1/risk2
+RR
+
+### OR check
 num <- 11 * 517
 denom <- 518 * 36
 OR <- num / denom
@@ -98,15 +104,15 @@ Table2
 
 Then we can estimate the risk ratio and odds ratio
 ```{r}
-riskratio.wald(Table2)
-oddsratio.wald(Table2)
+riskratio.wald(Table2, rev = c("both"))
+oddsratio.wald(Table2, rev = c("both"))
 ```
 Subjects who received Drug A had a 2% increase in Death compared to subjects who received Drug B (RR = 1.02; 95% CI: 1.00, 1.04; P=0.040). 
 Subjects who received Drug A had a 25% increase in Death compared to subjects who received Drug B (OR = 1.25; 95% CI: 1.01, 1.55; P=0.40). 
 In both these measures, the association was significant.
 
 ### Confounding
-Let's supppose we are interested in seeing whether Exercise is a confounder on the Drug to Death direct pathway. 
+Let's suppose we are interested in seeing whether Exercise is a confounder on the Drug to Death direct pathway. 
 
 To check if there is confounding, we need to determine if the confounder meets two criteria:
 1) The distribution of the confounding variable differs between exposed and unexposed groups
@@ -125,18 +131,18 @@ For the first criterion, we look at the association and distribution between Exe
 Table3 <- matrix(c(150, 100, 1600, 400), nrow = 2, ncol = 2)
 Table3
 
-riskratio.wald(Table3)
-oddsratio.wald(Table3)
+riskratio.wald(Table3, rev = c("both"))
+oddsratio.wald(Table3, rev = c("both"))
 
 
 # Among Drug B (N=1650)
 Table4 <- matrix(c(50, 100, 800, 700), nrow = 2, ncol = 2)
 Table4
 
-riskratio.wald(Table4)
-oddsratio.wald(Table4)
+riskratio.wald(Table4, rev = c("both"))
+oddsratio.wald(Table4, rev = c("both"))
 ```
-The results are summarized into the following table. Among subjects in Drug A, those who exercise had a lower risk (RR = 0.88; 95% CI: 0.84, 0.92) and odds (OR = 0.38; 95% CI: 0.28, 0.49) of Death compared to those who did not exercise. Similarly, among subjects in Drug B, those who exercise had a lower risk (RR = 0.93; 95% CI: 0.90, 0.96) and odds (OR = 0.44; 95% CI: 0.31, 0.62) of Death compared to those who did not exercise. 
+The results are summarized into the following table. Among subjects in Drug A, those who exercise had a lower risk (RR = 0.43; 95% CI: 0.34, 0.54) and odds (OR = 0.38; 95% CI: 0.28, 0.49) of Death compared to those who did not exercise. Similarly, among subjects in Drug B, those who exercise had a lower risk (RR = 0.47; 95% CI: 0.34, 0.49) and odds (OR = 0.44; 95% CI: 0.31, 0.62) of Death compared to those who did not exercise. 
 ```{r , echo=FALSE, fig.cap=" ", out.width = '70%'}
 knitr::include_graphics("C:\\Users\\mboun\\Dropbox\\Marks blog\\R - Epitools\\Figures and tables\\Figure 4.jpg")
 ```
@@ -159,10 +165,10 @@ We look at the association between Exercise and Death.
 Table5<- matrix(c(200, 200, 2400, 1100), nrow = 2, ncol= 2)
 Table5
 
-riskratio.wald(Table5)
-oddsratio.wald(Table5)
+riskratio.wald(Table5, rev = c("both"))
+oddsratio.wald(Table5, rev = c("both"))
 ```
-Subjects who exercise had a lower risk (RR = 0.92; 95% CI: 0.89, 0.94) and odds (OR = 0.46; 95% CI: 0.37, 0.56 ) of Death compared to subjects who did not exercise. Hence, this satisfies the second criterion for confounding. The results are summarized into a table below. 
+Subjects who exercise had a lower risk (RR = 0.50; 95% CI: 0.42, 0.60) and odds (OR = 0.46; 95% CI: 0.37, 0.56 ) of Death compared to subjects who did not exercise. Hence, this satisfies the second criterion for confounding. The results are summarized into a table below. 
 
 ```{r , echo=FALSE, fig.cap=" ", out.width = '70%'}
 knitr::include_graphics("C:\\Users\\mboun\\Dropbox\\Marks blog\\R - Epitools\\Figures and tables\\Figure 5.jpg")
@@ -192,18 +198,18 @@ To assess effect modification, we stratify the groups into the different levels 
 Table6 <- matrix(c(150, 50, 1600, 800), nrow = 2, ncol= 2)
 Table6
 
-riskratio.wald(Table6)
-oddsratio.wald(Table5)
+riskratio.wald(Table6, rev = c("both"))
+oddsratio.wald(Table5, rev = c("both"))
 
 # Among those who DONT exercise (Drug associated with Death)
 Table7<- matrix(c(100, 100, 400, 700), nrow = 2, ncol= 2)
 Table7
 
-riskratio.wald(Table7)
-oddsratio.wald(Table7)
+riskratio.wald(Table7, rev = c("both"))
+oddsratio.wald(Table7, rev = c("both"))
 ```
 
-After stratifying based on the Exercise variable level, we can see that the point estimates for the risk ratio and odds ratio are different. It's not easy to see the difference with the risk ratio (1.03 versus 1.09), but you can see the difference with the odds ratio (1.50 versus 1.75). The findings are summarized into a table below. 
+After stratifying based on the Exercise variable level, we can see that the point estimates for the risk ratio and odds ratio are different. You can see the difference with the risk ratio (1.46 versus 1.60) and with the difference with the odds ratio (1.50 versus 1.75). The findings are summarized into a table below. 
 
 ```{r , echo=FALSE, fig.cap=" ", out.width = '70%'}
 knitr::include_graphics("C:\\Users\\mboun\\Dropbox\\Marks blog\\R - Epitools\\Figures and tables\\Figure 8.jpg")
@@ -215,7 +221,7 @@ There are statistical tests that you can use to determine if these are different
 knitr::include_graphics("C:\\Users\\mboun\\Dropbox\\Marks blog\\R - Epitools\\Figures and tables\\Figure 9.jpg")
 ```
 
-Notice that the crude risk ratio (RR = 1.02) is outside the range of the stratified risk ratios (range: 1.03 and 1.09). This is a good indicator that Exercise is an effect modifier. Similarly, you can do this quick test with the odds ratio; notice how the crude odds ratio is not within the stratified odds ratio range (1.50 to 1.75). 
+Notice that the crude risk ratio (RR = 1.22) is outside the range of the stratified risk ratios (range: 1.46 and 1.60). This is a good indicator that Exercise is an effect modifier. Similarly, you can do this quick test with the odds ratio; notice how the crude odds ratio (OR = 1.25) is not within the stratified odds ratio range (1.50 to 1.75). 
 
 ## Conclusions
 Using `epitools` will help you quickly estimate the risk and odds ratio for any 2 x 2 contingency table. Moreover, you can also check for confouding and interaction using this tool. However, it is always prudent to make sure you are also using the raw data to control for confounders and assess interaction in a regression model. 
