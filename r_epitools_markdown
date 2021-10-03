@@ -227,5 +227,5 @@ Notice that the crude risk ratio (RR = 1.22) is outside the range of the stratif
 
 ## Conclusions
 Using `epitools` will help you quickly estimate the risk and odds ratio for any 2 x 2 contingency table. Moreover, you can also check for confouding and interaction using this tool. However, it is always prudent to make sure you are also using the raw data to control for confounders and assess interaction in a regression model. 
-
+ 
 
