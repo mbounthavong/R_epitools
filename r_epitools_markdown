@@ -49,7 +49,7 @@ knitr::include_graphics("C:\\Users\\mboun\\Dropbox\\Marks blog\\R - Epitools\\Fi
 # Step 2: Estimate the RR
 riskratio.wald(Table1, rev = c("both")) # use the rev() argument to change the arrangement of the contingency table
 ```
-The risk ratio is 0.95 with a 95% confidence interval of 0.93, 0.98. The p-value is <0.001. Therefore, subjects in the Exposure Group 1 had a 5% lower risk of developing the outcome (Outcome = 1) compared to subjects in the Exposure Group 2. 
+The risk ratio is 0.32 with a 95% confidence interval of 0.16, 0.62. The p-value is <0.001. Therefore, subjects in the Exposure Group 1 had a 68% lower risk of developing the outcome (Outcome = 1) compared to subjects in the Exposure Group 2. 
 
 ### Step 3: We use the `oddsratio.wald()` function to estimate the odds ratio for our object (`Table1`)
 ```{r}
@@ -109,8 +109,8 @@ Then we can estimate the risk ratio and odds ratio
 riskratio.wald(Table2, rev = c("both"))
 oddsratio.wald(Table2, rev = c("both"))
 ```
-Subjects who received Drug A had a 2% increase in Death compared to subjects who received Drug B (RR = 1.02; 95% CI: 1.00, 1.04; P=0.040). 
-Subjects who received Drug A had a 25% increase in Death compared to subjects who received Drug B (OR = 1.25; 95% CI: 1.01, 1.55; P=0.40). 
+Subjects who received Drug A had a 22% increase in Death compared to subjects who received Drug B (RR = 1.22; 95% CI: 1.01, 1.48; P=0.040). 
+Subjects who received Drug A had a 25% increase in Death compared to subjects who received Drug B (OR = 1.25; 95% CI: 1.01, 1.55; P=0.040). 
 In both these measures, the association was significant.
 
 ### Confounding
