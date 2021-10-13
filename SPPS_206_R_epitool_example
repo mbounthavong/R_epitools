@@ -27,10 +27,10 @@ Table1 <- matrix(c(4, 14, 51, 38), nrow = 2, ncol = 2)
 Table1
 
 # Step 2: Estimate the RR
-riskratio.wald(Table1, rev="both")
+riskratio.wald(Table1, rev="both")   ### Use the rev() argument to flip the rows and columns
 
 # Step 3: Estimate the OR
-oddsratio.wald(Table1, rev="both")
+oddsratio.wald(Table1, rev="both")   ### Use the rev() argument to flip the rows and columns
 
 ### You can double check your work 
 #### Risk ratio
