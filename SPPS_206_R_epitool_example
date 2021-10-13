@@ -1,0 +1,48 @@
+################################################################################
+# Title:        R tutorial - Mortality for Hill's steptomycin study
+# By:           Mark Bounthavong
+# Output:       R 
+# Category:     Biostatistics
+# Date:         12 October 2021
+# Updated:      NA
+# Updated by:   NA
+################################################################################
+
+# This tutorial will center around using the R package "epitools".
+
+### CLear the environment
+rm(list = ls())
+
+
+### Install the package "epitools"
+#install.packages("epitools")    ### Once installed, you can comment this line
+library("epitools")              ### Load the epitools package
+
+
+##########################################
+### Estimate the risk and odds ratios
+##########################################
+# Step 1: create a matrix based on the data Hill provided (1948)
+Table1 <- matrix(c(4, 14, 51, 38), nrow = 2, ncol = 2)
+Table1
+
+# Step 2: Estimate the RR
+riskratio.wald(Table1, rev="both")
+
+# Step 3: Estimate the OR
+oddsratio.wald(Table1, rev="both")
+
+### You can double check your work 
+#### Risk ratio
+risk1 <- 4 / (4 + 51)
+risk2 <- 14 / (14 + 38)
+RR <- risk1 / risk2
+RR
+
+
+#### Odds ratio
+num <- 4 * 38
+denom <- 14 * 51
+OR <- num / denom
+OR
+
